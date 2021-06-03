@@ -1,0 +1,76 @@
+import FirebaseAuth
+import FirebaseFirestoreSwift
+import FirebaseFirestore
+
+class TableViewController: UITableViewController {
+
+    // MARK: Variables
+ 
+    let amis = [["Arthur Dupond", "100 Points"], ["Jean Bernard", "120 Points"], ["Jean bist", "120 Points"], ["Jean tra", "120 Points"]]
+    let ref = Firestore.firestore().collection("utilisateur").document("EJj1MzvzVMMVZPMkNTLyDMKlEK83")
+
+
+
+    override func viewDidLoad() {
+
+    }
+    
+
+    // MARK: - Table view data source
+
+    override func numberOfSections(in tableView: UITableView) -> Int {
+        
+        return 2
+    }
+
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        
+        if section == 0 {
+            
+            
+
+            return 1
+
+            
+        }
+        if section == 1 {
+            return amis.count
+        }
+        
+        return 0
+    }
+    
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    
+        if indexPath.section == 0 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "soireeCell") as! AccueilCell
+            
+            ref.collection("soirées").getDocuments() { (querySnapshot, err) in
+                if let err = err {
+                    print("Error getting documents: \(err)")
+                } else {
+                    for document in querySnapshot!.documents {
+                        print("\(document.documentID) => \(document.data())")
+                        let x = document.data()
+                        self.tbl.append([x["nom"] as! String, x["nombre_personne"] as! String])
+                        }
+
+                    self.tbl.remove(at: 0)
+                    cell.nomSoireeLabel.text = self.tbl[indexPath.row][0]
+                    cell.nombreLabel.text = self.tbl[indexPath.row][1]
+                    }
+                }
+            return cell
+            
+        } else {
+            
+            let cell = tableView.dequeueReusableCell(withIdentifier: "soireeCell") as! AccueilCell
+            
+            cell.nomSoireeLabel.text = amis[indexPath.row ][0]
+            cell.nombreLabel.text = amis[indexPath.row][1]
+    
+            return cell
+            
+        }
+    
+    }
